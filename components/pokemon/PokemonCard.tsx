@@ -8,10 +8,7 @@ interface PokemonCardProps {
 
 export const PokemonCard = ({pokemon}: PokemonCardProps) => {
   const router = useRouter();
-  const onClick = () => {
-    console.log("Pushing");
-    router.push(`/pokemon/${pokemon.id}`);
-  };
+  const onClick = () => router.push(`/pokemon/${pokemon.id}`);
 
   return (
     <Grid xs={6} sm={3} md={2} xl={1} key={pokemon.id}>

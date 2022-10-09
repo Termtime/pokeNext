@@ -1,19 +1,18 @@
 import {Grid} from "@nextui-org/react";
 import {GetStaticProps} from "next";
-import {ReactElement} from "react";
+import {ReactElement, useEffect} from "react";
 import {Layout} from "../components/layouts";
 import {NextPageWithLayout} from "./_app";
-import {pokeApi} from "../api";
-import {PokemonListResponse, SmallPokemon} from "../interfaces/pokemonList";
-import Image from "next/image";
+import {SmallPokemon} from "../interfaces/pokemonList";
 import {PokemonCard} from "../components/pokemon/PokemonCard";
+import {useContext} from "react";
+import {getPokemonList} from "../api/pokeApi";
 
-interface HomeProps {
+interface HomePageProps {
   pokemons: SmallPokemon[];
 }
 
-const Home: NextPageWithLayout<HomeProps> = ({pokemons}) => {
-  console.log({pokemons});
+const HomePage: NextPageWithLayout<HomePageProps> = ({pokemons}) => {
   return (
     <>
       <Grid.Container gap={2} justify="flex-start">
@@ -25,30 +24,12 @@ const Home: NextPageWithLayout<HomeProps> = ({pokemons}) => {
   );
 };
 
-Home.getLayout = function getLayout(page: ReactElement) {
+HomePage.getLayout = function getLayout(page: ReactElement) {
   return <Layout title="PokéNext - Pokedex con NextJS">{page}</Layout>;
 };
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
-  const {data} = await pokeApi.get<PokemonListResponse>("/pokemon?limit=151");
-  console.log({data});
-
-  const pokemons = data.results.map<SmallPokemon>((pokemon) => {
-    const id = pokemon.url.match(/(?<=\/)[0-9]+(?=\/$)/)?.[0];
-
-    if (!id) {
-      throw new Error("No se pudo obtener el id del pokemon");
-    }
-
-    const img = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${id}.svg`;
-
-    return {
-      name: pokemon.name,
-      url: pokemon.url,
-      id,
-      img,
-    };
-  });
+  const pokemons = await getPokemonList();
 
   return {
     props: {
@@ -57,4 +38,4 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
   };
 };
 
-export default Home;
+export default HomePage;
