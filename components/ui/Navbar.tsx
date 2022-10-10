@@ -8,15 +8,18 @@ import {
 } from "@nextui-org/react";
 import React from "react";
 import NextLink from "next/link";
-import {AutocompleteInput, AutocompleteOption} from "./AutocompleteInput";
+import {
+  AutocompleteInput,
+  AutocompleteOption,
+} from "./AutocompleteInput/AutocompleteInput";
 import {useRouter} from "next/router";
 import {SmallPokemon} from "../../interfaces";
 import {useEffect} from "react";
 import {getPokemonList} from "../../api/pokeApi";
 
 /**
- * TODO: Este componente es candidato para ser un componente que sea
- * estaticamente generado, cuando esto sea posible en NextJS
+ * TODO: This component is a candidate to be a statically generated component,
+ * whenever this becomes possible in NextJS
  */
 export const Navbar = () => {
   const {theme} = useTheme();

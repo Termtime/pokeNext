@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useId, useState} from "react";
+import React, {useCallback, useEffect, useId, useMemo, useState} from "react";
 import {
   Button,
   Container,
@@ -9,8 +9,9 @@ import {
   Text,
   useTheme,
 } from "@nextui-org/react";
-import {SmallPokemon} from "../../interfaces";
-import {capitalizeFirstLetter} from "../../utils/text";
+import {SmallPokemon} from "../../../interfaces";
+import {capitalizeFirstLetter} from "../../../utils/text";
+import styles from "./autocompleteInput.module.css";
 
 export interface AutocompleteOption {
   label: string;
@@ -32,33 +33,85 @@ export const AutocompleteInput = ({
   ...rest
 }: AutocompleteInputProps) => {
   const [suggestions, setSuggestions] = useState<AutocompleteOption[]>([]);
+  const [elements, setElements] = useState<HTMLElement[]>([]);
   const [internalValue, setInternalValue] = useState<string>(
     value?.toString() || ""
   );
+  const [focusedSuggestionIndex, setFocusedSuggestionIndex] =
+    useState<number>(-1);
   const id = useId();
   const {theme} = useTheme();
 
-  const handleSubmit = (value?: string) => {
-    if (onAutocompleteSubmit) {
-      onAutocompleteSubmit(value);
-    }
+  useEffect(() => {
+    const elements = Array.from(
+      document.getElementsByClassName(
+        styles.suggestion
+      ) as HTMLCollectionOf<HTMLElement>
+    );
+
+    setElements(elements);
+  }, [suggestions]);
+
+  /**
+   * Cleans up suggestions and sets the input value to the selected option
+   */
+  const cleanupSuggestionsOnSubmit = useCallback((option: string) => {
+    cleanupSuggestions();
+    setInternalValue(capitalizeFirstLetter(option));
+  }, []);
+
+  const handleAutocompleteClick = useCallback(
+    (option: AutocompleteOption) => {
+      if (onAutocompleteOptionClick) {
+        onAutocompleteOptionClick(option);
+      }
+      cleanupSuggestionsOnSubmit(option.label);
+    },
+    [cleanupSuggestionsOnSubmit, onAutocompleteOptionClick]
+  );
+
+  const cleanupSuggestions = () => {
     setSuggestions([]);
-    setInternalValue(capitalizeFirstLetter(value || ""));
+    setFocusedSuggestionIndex(-1);
   };
+
+  const handleSubmit = useCallback(
+    (value?: string) => {
+      if (onAutocompleteSubmit) {
+        onAutocompleteSubmit(value);
+        cleanupSuggestionsOnSubmit(capitalizeFirstLetter(value || ""));
+      }
+
+      if (focusedSuggestionIndex !== -1) {
+        const option = suggestions[focusedSuggestionIndex];
+        if (option && onAutocompleteOptionClick) {
+          handleAutocompleteClick(option);
+        }
+      }
+    },
+    [
+      onAutocompleteSubmit,
+      focusedSuggestionIndex,
+      cleanupSuggestionsOnSubmit,
+      suggestions,
+      onAutocompleteOptionClick,
+      handleAutocompleteClick,
+    ]
+  );
 
   const generateSuggestions = (text: string) => {
     if (!text || text.length === 0) {
       return [];
     }
 
-    // Ya que solo es una letra, devolver matches que comiencen especificamente con esa letra
+    // Because its only one letter, return matches that start specifically with that letter
     if (text.length < 2) {
       return autocompleteOptions
         .filter((option) => option.label.startsWith(text))
         .sort((a, b) => a.label.localeCompare(b.label));
     }
 
-    // Devolver matches que contengan las letras en cualquier orden
+    // Return matches that contains the letters in any part of the string
     return autocompleteOptions
       .filter((option) => {
         const value = option.label;
@@ -73,23 +126,36 @@ export const AutocompleteInput = ({
       });
   };
 
+  const handleKeyDown = useMemo(() => {
+    return (e: React.KeyboardEvent) => {
+      console.log({key: e.key, elements});
+
+      if (e.key === "ArrowDown") {
+        if (focusedSuggestionIndex < elements.length) {
+          setFocusedSuggestionIndex((prev) => prev + 1);
+        }
+        e.preventDefault();
+      }
+      if (e.key === "ArrowUp") {
+        if (focusedSuggestionIndex > -1) {
+          setFocusedSuggestionIndex((prev) => prev - 1);
+        }
+
+        e.preventDefault();
+      }
+    };
+  }, [elements, focusedSuggestionIndex]);
+
   const handleOnChange = (e: React.ChangeEvent<FormElement>) => {
     if (onChange) {
       onChange(e);
     } else {
       setInternalValue(e.target.value);
+      setFocusedSuggestionIndex(-1);
     }
 
     // trigger autocomplete logic from suggestions
     setSuggestions(generateSuggestions(e.target.value || ""));
-  };
-
-  const handleAutocompleteClick = (option: AutocompleteOption) => {
-    if (onAutocompleteOptionClick) {
-      onAutocompleteOptionClick(option);
-    }
-    setInternalValue(capitalizeFirstLetter(option.label));
-    setSuggestions([]);
   };
 
   return (
@@ -111,10 +177,12 @@ export const AutocompleteInput = ({
           aria-label="Search"
           {...rest}
           value={internalValue}
+          onKeyDown={handleKeyDown}
           onChange={handleOnChange}
           css={{
             ...rest.css,
-            // Necesario ya que el button tiene un minWidth de .space[48]
+
+            // Needed cause the button has a minWidth of .space[48]
             minWidth: theme?.space[52]?.value,
           }}
         />
@@ -139,10 +207,12 @@ export const AutocompleteInput = ({
             return (
               <Button
                 flat
+                isFocusVisible={i === focusedSuggestionIndex}
+                className={styles.suggestion}
                 color="default"
                 css={{
                   p: 0,
-                  m: 0,
+                  m: 3,
                   color: "White",
                   border: "none",
                   borderRadius: "0px",

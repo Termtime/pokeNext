@@ -1,2 +1,2 @@
-export * from "./AutocompleteInput";
+export * from "./AutocompleteInput/AutocompleteInput";
 export * from "./Navbar";
