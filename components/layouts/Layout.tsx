@@ -10,7 +10,7 @@ export const Layout = ({children, title}: LayoutProps) => {
   return (
     <>
       <Head>
-        <title>{title || "Pokemon App"}</title>
+        <title>{title || "PokéNext App"}</title>
         <meta name="author" content="Mario Mejía" />
         <meta
           name="description"

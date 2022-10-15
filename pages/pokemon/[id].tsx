@@ -1,12 +1,19 @@
 import {GetStaticProps, GetStaticPaths} from "next";
-import {useRouter} from "next/router";
-import React from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Layout} from "../../components/layouts";
 import {Pokemon} from "../../interfaces";
 import {NextPageWithLayout} from "../_app";
 import pokeApi from "../../api/pokeApi";
-import {Grid, Card, Text, Button, Container, Image} from "@nextui-org/react";
-import {capitalizeFirstLetter} from "../../utils";
+import {
+  Grid,
+  Card,
+  Text,
+  Button,
+  Container,
+  Image,
+  ButtonProps,
+} from "@nextui-org/react";
+import {capitalizeFirstLetter, LocalStorageService} from "../../utils";
 
 interface PokemonPageProps {
   pokemon: Pokemon;
@@ -15,6 +22,26 @@ interface PokemonPageProps {
 export const PokemonPage: NextPageWithLayout<PokemonPageProps> = ({
   pokemon,
 }) => {
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const handleFavoriteClick = useCallback(() => {
+    LocalStorageService.toggleFavorite(pokemon.id);
+    setIsFavorite(!isFavorite);
+  }, [isFavorite, pokemon.id]);
+
+  const buttonStyleProps: Partial<ButtonProps> = useMemo(() => {
+    return {
+      color: isFavorite ? "success" : "gradient",
+      children: isFavorite ? "Remove from favorites" : "Add to favorites",
+    };
+  }, [isFavorite]);
+
+  useEffect(() => {
+    const isFav = LocalStorageService.getFavorite(pokemon.id);
+
+    setIsFavorite(isFav);
+  }, [pokemon.id]);
+
   return (
     <Grid.Container css={{marginTop: "5px"}} gap={2}>
       <Grid xs={12} sm={4}>
@@ -39,9 +66,7 @@ export const PokemonPage: NextPageWithLayout<PokemonPageProps> = ({
               {pokemon.name}
             </Text>
 
-            <Button color="gradient" ghost>
-              Guardar en favoritos
-            </Button>
+            <Button ghost onClick={handleFavoriteClick} {...buttonStyleProps} />
           </Card.Header>
           <Card.Body>
             <Text>Sprites:</Text>

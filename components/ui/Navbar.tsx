@@ -85,7 +85,7 @@ export const Navbar = () => {
             P
           </Text>
           <Text css={{m: 0}} color="white" h3>
-            okémon
+            okéNext
           </Text>
         </Link>
       </NextLink>
