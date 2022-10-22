@@ -14,6 +14,7 @@ import {
   ButtonProps,
 } from "@nextui-org/react";
 import {capitalizeFirstLetter, LocalStorageService} from "../../utils";
+import confetti from "canvas-confetti";
 
 interface PokemonPageProps {
   pokemon: Pokemon;
@@ -27,6 +28,16 @@ export const PokemonPage: NextPageWithLayout<PokemonPageProps> = ({
   const handleFavoriteClick = useCallback(() => {
     LocalStorageService.toggleFavorite(pokemon.id);
     setIsFavorite(!isFavorite);
+
+    if (isFavorite) return;
+
+    confetti({
+      zIndex: 999,
+      particleCount: 100,
+      spread: 160,
+      angle: -100,
+      origin: {y: 0, x: 1},
+    });
   }, [isFavorite, pokemon.id]);
 
   const buttonStyleProps: Partial<ButtonProps> = useMemo(() => {

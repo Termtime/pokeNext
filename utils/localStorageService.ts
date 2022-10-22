@@ -23,4 +23,8 @@ export class LocalStorageService {
       ? this.removeFavorite(id)
       : this.addFavorite(id);
   };
+
+  static getFavorites = () => {
+    return JSON.parse(localStorage.getItem("favorites") || "[]");
+  };
 }

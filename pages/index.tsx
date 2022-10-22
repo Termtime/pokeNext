@@ -4,7 +4,7 @@ import {ReactElement, useEffect} from "react";
 import {Layout} from "../components/layouts";
 import {NextPageWithLayout} from "./_app";
 import {SmallPokemon} from "../interfaces/pokemonList";
-import {PokemonCard} from "../components/pokemon/PokemonCard";
+import {PokemonCard} from "../components/ui/pokemon/PokemonCard";
 import {useContext} from "react";
 import {getPokemonList} from "../api/pokeApi";
 
