@@ -15,7 +15,7 @@ import {
 import {useRouter} from "next/router";
 import {SmallPokemon} from "../../interfaces";
 import {useEffect} from "react";
-import {getPokemonList} from "../../api/pokeApi";
+import {PokeApi} from "../../api";
 
 /**
  * TODO: This component is a candidate to be a statically generated component,
@@ -28,7 +28,7 @@ export const Navbar = () => {
 
   useEffect(() => {
     const getPokemons = async () => {
-      const pokemons = await getPokemonList();
+      const pokemons = await PokeApi.getPokemonList();
       setPokemons(pokemons);
     };
     getPokemons();

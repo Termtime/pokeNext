@@ -1,12 +1,11 @@
 import {Grid} from "@nextui-org/react";
 import {GetStaticProps} from "next";
-import {ReactElement, useEffect} from "react";
+import {ReactElement} from "react";
 import {Layout} from "../components/layouts";
 import {NextPageWithLayout} from "./_app";
 import {SmallPokemon} from "../interfaces/pokemonList";
 import {PokemonCard} from "../components/ui/pokemon/PokemonCard";
-import {useContext} from "react";
-import {getPokemonList} from "../api/pokeApi";
+import {PokeApi} from "../api";
 
 interface HomePageProps {
   pokemons: SmallPokemon[];
@@ -29,7 +28,7 @@ HomePage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
-  const pokemons = await getPokemonList();
+  const pokemons = await PokeApi.getPokemonList();
 
   return {
     props: {
