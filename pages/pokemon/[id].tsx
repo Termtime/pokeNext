@@ -124,31 +124,41 @@ PokemonPage.getLayout = function getLayout(page) {
 
 // You should use getStaticPaths if you’re statically pre-rendering pages that use dynamic routes
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
-  const pokemons151 = Array.from({length: 151}, (_, i) => `${i + 1}`);
+  const pokemonsByName = await PokeApi.getPokemonList();
+
   const paths = [
-    ...pokemons151.map((id) => ({
+    // Create all phats for the 151 first pokemons by id
+    ...pokemonsByName.map((pokemon) => ({
       params: {
-        id,
+        id: pokemon.id,
+      },
+    })),
+    // Create all phats for the 151 first pokemons by name
+    ...pokemonsByName.map((pokemon) => ({
+      params: {
+        id: pokemon.name,
       },
     })),
   ];
 
   return {
     paths,
-    // Show 404 if the page doesn't exist
+    // Allow Incremental Static Generation
     fallback: "blocking",
   };
 };
 
 export const getStaticProps: GetStaticProps = async ({params}) => {
-  const {id} = params as {id: string};
+  const {id: nameOrId} = params as {id: string};
 
-  const pokemon = await PokeApi.getPokemonBasicInfo(id);
+  const pokemon = await PokeApi.getPokemonBasicInfo(nameOrId);
 
   if (!pokemon) {
     return {
       redirect: {
         destination: "/",
+        // This is not permanent, as there could be a new pokemon with the
+        // specified id/name in the future
         permanent: false,
       },
     };

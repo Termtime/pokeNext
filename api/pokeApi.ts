@@ -35,6 +35,10 @@ export class PokeApi {
    * Used for the SSG of the pokemon pages
    */
   public static getPokemonBasicInfo = async (nameOrId: string) => {
+    if (nameOrId === "") {
+      return null;
+    }
+
     try {
       const {data} = await this.api.get<Pokemon>(`/pokemon/${nameOrId}`);
 
