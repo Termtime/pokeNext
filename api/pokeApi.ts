@@ -1,5 +1,5 @@
 import axios from "axios";
-import {PokemonListResponse, SmallPokemon} from "../interfaces";
+import {Pokemon, PokemonListResponse, SmallPokemon} from "../interfaces";
 
 export class PokeApi {
   public static api = axios.create({
@@ -29,5 +29,20 @@ export class PokeApi {
     });
 
     return pokemons;
+  };
+
+  /**
+   * Used for the SSG of the pokemon pages
+   */
+  public static getPokemonBasicInfo = async (nameOrId: string) => {
+    const {data} = await this.api.get<Pokemon>(`/pokemon/${nameOrId}`);
+
+    const pokemon = {
+      id: data.id,
+      name: data.name,
+      sprites: data.sprites,
+    };
+
+    return pokemon;
   };
 }

@@ -143,11 +143,9 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 export const getStaticProps: GetStaticProps = async ({params}) => {
   const {id} = params as {id: string};
 
-  const {data} = await PokeApi.api.get<Pokemon>(`/pokemon/${id}`);
-
   return {
     props: {
-      pokemon: data,
+      pokemon: await PokeApi.getPokemonBasicInfo(id),
     },
   };
 };
