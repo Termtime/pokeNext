@@ -21,18 +21,15 @@ export const Layout = ({children, title}: LayoutProps) => {
       <Head>
         <title>{title || "PokéNext App"}</title>
         <meta name="author" content="Mario Mejía" />
-        <meta name="description" content={`Information about ${title}`} />
+        <meta name="description" content={`${title}`} />
         <meta
           name="keywords"
           content={`"${title}, pokedex, pokemon, pokemon app"`}
         />
 
         {/* Open Graph Meta Tags */}
-        <meta property="og:title" content={`Information about ${title}`} />
-        <meta
-          property="og:description"
-          content={`This is the page about ${title}`}
-        />
+        <meta property="og:title" content={`${title}`} />
+        <meta property="og:description" content={`Gotta catch them all!`} />
         <meta property="og:image" content={`${origin}/img/banner.png`} />
       </Head>
 
