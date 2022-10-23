@@ -81,16 +81,20 @@ export const AutocompleteInput = ({
 
   const handleSubmit = useCallback(
     (value?: string) => {
-      if (onAutocompleteSubmit) {
-        onAutocompleteSubmit(value);
-        cleanupSuggestionsOnSubmit(capitalizeFirstLetter(value || ""));
-      }
-
+      // If there is a focused suggestion, use it
       if (focusedSuggestionIndex !== -1) {
         const option = suggestions[focusedSuggestionIndex];
         if (option && onAutocompleteOptionClick) {
           handleAutocompleteClick(option);
         }
+
+        return;
+      }
+
+      // If there is no focused suggestion, use the value of the input
+      if (onAutocompleteSubmit) {
+        onAutocompleteSubmit(value);
+        cleanupSuggestionsOnSubmit(capitalizeFirstLetter(value || ""));
       }
     },
     [

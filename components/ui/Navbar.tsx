@@ -42,12 +42,14 @@ export const Navbar = () => {
   );
 
   const onAutocompleteOptionClick = (option: AutocompleteOption) => {
+    console.log({option: option?.value.name});
     router.push(`/pokemon/${option.value?.name}`);
   };
 
   const onAutoCompleteSubmit = (value?: string) => {
     if (value) {
-      router.push(`/pokemon/${value}`);
+      console.log({option2: value});
+      router.push(`/pokemon/${value.toLowerCase()}`);
     }
   };
 
