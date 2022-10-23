@@ -24,6 +24,8 @@ interface AutocompleteInputProps extends Partial<InputProps> {
   onAutocompleteSubmit?: (value?: string) => void;
 }
 
+// TODO: Maybe implement floating-ui in the future.
+// Reference: https://codesandbox.io/s/fragrant-water-bsuirj?file=/src/App.tsx
 export const AutocompleteInput = ({
   value,
   onChange,
@@ -131,14 +133,18 @@ export const AutocompleteInput = ({
       console.log({key: e.key, elements});
 
       if (e.key === "ArrowDown") {
-        if (focusedSuggestionIndex < elements.length) {
+        if (focusedSuggestionIndex < elements.length - 1) {
           setFocusedSuggestionIndex((prev) => prev + 1);
+        } else {
+          setFocusedSuggestionIndex(0);
         }
         e.preventDefault();
       }
       if (e.key === "ArrowUp") {
-        if (focusedSuggestionIndex > -1) {
+        if (focusedSuggestionIndex > 0) {
           setFocusedSuggestionIndex((prev) => prev - 1);
+        } else {
+          setFocusedSuggestionIndex(elements.length - 1);
         }
 
         e.preventDefault();
@@ -156,6 +162,11 @@ export const AutocompleteInput = ({
 
     // trigger autocomplete logic from suggestions
     setSuggestions(generateSuggestions(e.target.value || ""));
+  };
+
+  const handleBlur = () => {
+    // close suggestions
+    cleanupSuggestions();
   };
 
   return (
@@ -179,6 +190,8 @@ export const AutocompleteInput = ({
           value={internalValue}
           onKeyDown={handleKeyDown}
           onChange={handleOnChange}
+          onBlur={handleBlur}
+          onFocus={() => setSuggestions(generateSuggestions(internalValue))}
           css={{
             ...rest.css,
 
