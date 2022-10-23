@@ -42,7 +42,7 @@ export const Navbar = () => {
   );
 
   const onAutocompleteOptionClick = (option: AutocompleteOption) => {
-    router.push(`/name/${option.value?.name}`);
+    router.push(`/pokemon/${option.value?.name}`);
   };
 
   const onAutoCompleteSubmit = (value?: string) => {
@@ -53,7 +53,7 @@ export const Navbar = () => {
         (pokemon) => pokemon.name.toLowerCase() === value.toLowerCase()
       );
       if (pokemon) {
-        router.push(`/name/${pokemon.name}`);
+        router.push(`/pokemon/${pokemon.name}`);
       }
     }
   };
