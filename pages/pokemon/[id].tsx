@@ -136,17 +136,31 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
   return {
     paths,
     // Show 404 if the page doesn't exist
-    fallback: false,
+    fallback: "blocking",
   };
 };
 
 export const getStaticProps: GetStaticProps = async ({params}) => {
   const {id} = params as {id: string};
 
+  const pokemon = await PokeApi.getPokemonBasicInfo(id);
+
+  if (!pokemon) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
   return {
     props: {
-      pokemon: await PokeApi.getPokemonBasicInfo(id),
+      pokemon,
     },
+    // Just testing Incremental Static Regeneration
+    // Really not needed for this project
+    revalidate: 86400, // 24 hours
   };
 };
 

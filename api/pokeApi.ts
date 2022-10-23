@@ -35,14 +35,16 @@ export class PokeApi {
    * Used for the SSG of the pokemon pages
    */
   public static getPokemonBasicInfo = async (nameOrId: string) => {
-    const {data} = await this.api.get<Pokemon>(`/pokemon/${nameOrId}`);
+    try {
+      const {data} = await this.api.get<Pokemon>(`/pokemon/${nameOrId}`);
 
-    const pokemon = {
-      id: data.id,
-      name: data.name,
-      sprites: data.sprites,
-    };
-
-    return pokemon;
+      return {
+        id: data.id,
+        name: data.name,
+        sprites: data.sprites,
+      };
+    } catch {
+      return null;
+    }
   };
 }
