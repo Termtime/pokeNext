@@ -46,16 +46,44 @@ export const Navbar = () => {
   };
 
   const onAutoCompleteSubmit = (value?: string) => {
-    console.log({value});
-
     if (value) {
-      const pokemon = pokemons.find(
-        (pokemon) => pokemon.name.toLowerCase() === value.toLowerCase()
-      );
-      if (pokemon) {
-        router.push(`/pokemon/${pokemon.name}`);
-      }
+      router.push(`/pokemon/${value}`);
     }
+  };
+
+  const customSuggestionGenerator = (text: string) => {
+    if (!text || text.length === 0) {
+      return [];
+    }
+
+    const byId = autocompleteOptions.filter(
+      (option) => option.value?.id === text
+    );
+
+    // Because its only one letter, return matches that start specifically with that letter
+    if (text.length < 2) {
+      const byName = autocompleteOptions
+        .filter((option) => option.label.startsWith(text))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+      return [...byId, ...byName];
+    }
+
+    // Return matches that contains the letters in any part of the string
+    const byName = autocompleteOptions
+      .filter((option) => {
+        const value = option.label;
+        return value.toLowerCase().includes(text.toLowerCase());
+      })
+      .slice(0, 5)
+      .sort((a, b) => {
+        const valueA = a.label;
+        const valueB = b.label;
+
+        return valueA.localeCompare(valueB);
+      });
+
+    return [...byId, ...byName];
   };
 
   return (
@@ -103,6 +131,7 @@ export const Navbar = () => {
         autocompleteOptions={autocompleteOptions}
         onAutocompleteOptionClick={onAutocompleteOptionClick}
         onAutocompleteSubmit={onAutoCompleteSubmit}
+        suggestionGenerator={customSuggestionGenerator}
       />
 
       <Spacer css={{flex: 1}} />

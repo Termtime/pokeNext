@@ -22,6 +22,7 @@ interface AutocompleteInputProps extends Partial<InputProps> {
   autocompleteOptions: AutocompleteOption[];
   onAutocompleteOptionClick?: (option: AutocompleteOption) => void;
   onAutocompleteSubmit?: (value?: string) => void;
+  suggestionGenerator?: (value: string) => AutocompleteOption[];
 }
 
 // TODO: Maybe implement floating-ui in the future.
@@ -32,6 +33,7 @@ export const AutocompleteInput = ({
   autocompleteOptions,
   onAutocompleteOptionClick,
   onAutocompleteSubmit,
+  suggestionGenerator,
   ...rest
 }: AutocompleteInputProps) => {
   const [suggestions, setSuggestions] = useState<AutocompleteOption[]>([]);
@@ -101,7 +103,7 @@ export const AutocompleteInput = ({
     ]
   );
 
-  const generateSuggestions = (text: string) => {
+  const defaultSuggestionGenerator = (text: string) => {
     if (!text || text.length === 0) {
       return [];
     }
@@ -128,10 +130,16 @@ export const AutocompleteInput = ({
       });
   };
 
+  const handleGenerateSuggestion = (text: string) => {
+    if (suggestionGenerator) {
+      return suggestionGenerator(text);
+    }
+
+    return defaultSuggestionGenerator(text);
+  };
+
   const handleKeyDown = useMemo(() => {
     return (e: React.KeyboardEvent) => {
-      console.log({key: e.key, elements});
-
       if (e.key === "ArrowDown") {
         if (focusedSuggestionIndex < elements.length - 1) {
           setFocusedSuggestionIndex((prev) => prev + 1);
@@ -161,7 +169,7 @@ export const AutocompleteInput = ({
     }
 
     // trigger autocomplete logic from suggestions
-    setSuggestions(generateSuggestions(e.target.value || ""));
+    setSuggestions(handleGenerateSuggestion(e.target.value || ""));
   };
 
   const handleBlur = () => {
@@ -191,7 +199,9 @@ export const AutocompleteInput = ({
           onKeyDown={handleKeyDown}
           onChange={handleOnChange}
           onBlur={handleBlur}
-          onFocus={() => setSuggestions(generateSuggestions(internalValue))}
+          onFocus={() =>
+            setSuggestions(handleGenerateSuggestion(internalValue))
+          }
           css={{
             ...rest.css,
 
